@@ -1,24 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مجوهرات الصحابة</title>
+<title>شاشة الصحابة</title>
 <style>
-  body {
-    font-family: 'Georgia', serif;
-    background: #fdf8f0;
-    color: #333;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  /* (rest of CSS omitted for brevity in this context) */
+body {font-family:"Tajawal",sans-serif;background:#0e0e0e;color:#fff;margin:0;padding:0;display:flex;flex-direction:column;align-items:center;}
+.header{margin-top:20px;font-size:40px;font-weight:800;letter-spacing:2px;color:gold;text-shadow:0 0 10px gold;animation:glow 2s infinite alternate;}
+@keyframes glow{from{text-shadow:0 0 10px gold;}to{text-shadow:0 0 25px gold;}}
+.table-container{width:95%;max-width:900px;margin-top:20px;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;background:#1a1a1a;border-radius:10px;overflow:hidden;}
+th,td{padding:15px;text-align:center;border-bottom:1px solid #333;}
+th{background:#222;font-size:18px;color:gold;}
+tr:hover{background:#2d2d2d;}
+.change-up{color:#00ff6a;font-weight:bold;animation:upBlink 1.5s infinite;}
+.change-down{color:#ff4d4d;font-weight:bold;animation:downBlink 1.5s infinite;}
+@keyframes upBlink{0%{text-shadow:0 0 10px #00ff6a;}100%{text-shadow:0 0 20px #00ff6a;}}
+@keyframes downBlink{0%{text-shadow:0 0 10px #ff4d4d;}100%{text-shadow:0 0 20px #ff4d4d;}}
+.datetime{margin-top:10px;font-size:20px;color:#00cfff;text-shadow:0 0 10px #00cfff;}
+.edit-btn{background:gold;color:black;padding:12px 25px;margin-top:20px;border:none;border-radius:8px;font-size:18px;cursor:pointer;transition:0.3s;}
+.edit-btn:hover{background:#ffda55;}
+.popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:9999;}
+.popup-content{background:#1a1a1a;padding:25px;border-radius:12px;width:300px;text-align:center;box-shadow:0 0 20px gold;}
+input{width:90%;padding:10px;margin:10px 0;border-radius:5px;border:none;text-align:center;font-size:16px;}
+.save-btn{background:#00ff6a;padding:10px 20px;border:none;border-radius:6px;margin-top:10px;cursor:pointer;font-size:16px;}
+.close-btn{background:#ff4d4d;padding:8px 20px;border:none;border-radius:6px;cursor:pointer;margin-top:10px;}
 </style>
 </head>
 <body>
-مشروع شاشة الصحابة
+<div class="header">مجوهرات الصحابة</div>
+<div class="datetime" id="datetime"></div>
+<div class="table-container">
+<table>
+<thead><tr><th>العيار</th><th>السعر</th><th>الفرق</th></tr></thead>
+<tbody id="goldTable"></tbody>
+</table>
+</div>
+<button class="edit-btn" onclick="openPopup()">تغيير الأسعار</button>
+<div class="popup" id="popup">
+<div class="popup-content">
+<h3>تعديل الأسعار</h3>
+<input id="newPrice21" type="number" placeholder="سعر عيار 21">
+<input id="newPrice24" type="number" placeholder="سعر عيار 24">
+<button class="save-btn" onclick="savePrices()">حفظ</button>
+<button class="close-btn" onclick="closePopup()">إغلاق</button>
+</div>
+</div>
+<script>
+function updateDateTime(){document.getElementById("datetime").innerHTML=new Date().toLocaleString("en-GB");}
+setInterval(updateDateTime,1000);updateDateTime();
+const tableData=[{type:"عيار 21",price:0,lastPrice:0},{type:"عيار 24",price:0,lastPrice:0}];
+function loadSavedPrices(){tableData.forEach((item,index)=>{const saved=localStorage.getItem(`gold_${index}`);if(saved)item.price=parseFloat(saved);});renderTable();}
+function renderTable(){const table=document.getElementById("goldTable");table.innerHTML="";tableData.forEach(item=>{const change=item.price-item.lastPrice;const changeClass=change>0?"change-up":change<0?"change-down":"";const changeSymbol=change>0?"▲":change<0?"▼":"-";table.innerHTML+=`<tr><td>${item.type}</td><td>${item.price}</td><td class="${changeClass}">${changeSymbol} ${change.toFixed(2)}</td></tr>`;});}
+function openPopup(){document.getElementById("popup").style.display="flex";}
+function closePopup(){document.getElementById("popup").style.display="none";}
+function savePrices(){const p21=document.getElementById("newPrice21").value;const p24=document.getElementById("newPrice24").value;if(p21){tableData[0].lastPrice=tableData[0].price;tableData[0].price=parseFloat(p21);localStorage.setItem("gold_0",p21);}if(p24){tableData[1].lastPrice=tableData[1].price;tableData[1].price=parseFloat(p24);localStorage.setItem("gold_1",p24);}closePopup();renderTable();}
+loadSavedPrices();
+</script>
 </body>
 </html>
